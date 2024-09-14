@@ -1,6 +1,9 @@
 package com.rest.api.project.restproject.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,43 +27,76 @@ public class BookController {
 
     //for multiple books
     @GetMapping("/")
-    public Iterable<Book> getBooks(){
+    public ResponseEntity<Iterable<Book>> getBooks(){
         Iterable <Book> books= this.senter.getBooks();
-         books.forEach(book-> System.out.println(book));
-         return books;
+        if(books!= null) {
+        	return ResponseEntity.ok(books);        	
+        }
+        else {
+        	return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
     }
 
     //for single book
     @GetMapping("/{id}")
-    public Book getBook(@PathVariable int id) {
-        return this.senter.getBook(id);
+    public ResponseEntity<Book> getBook(@PathVariable int id) {
+    	Book boo=  this.senter.getBook(id);
+    	 if(boo!= null) {
+         	return ResponseEntity.ok(boo);        	
+         }
+         else {
+         	return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+         }
     }
 
     //for adding the book to database
     @PostMapping("/add")
-    public Book addBook(@RequestBody Book book){
-        return this.senter.addBook(book);
+    public ResponseEntity<Book> addBook(@RequestBody Book book){
+    	 Book boo= null;
+       try {
+    	  boo= this.senter.addBook(book);
+    	  return ResponseEntity.status(HttpStatus.CREATED).body(boo);
+       }
+       catch (Exception e) {
+    	   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	}
     }
     
     //for deleting single book
     @DeleteMapping("/delete/{id}")
-     public Iterable<Book> deleteBook(@PathVariable int id){
-    	 Iterable<Book> books= this.senter.deleteBook(id);
-    	 return books;
+     public ResponseEntity<Iterable<Book>> deleteBook(@PathVariable int id){
+    	Iterable<Book> books;
+    	 try {
+          books= this.senter.deleteBook(id);
+       	  return ResponseEntity.status(HttpStatus.OK).body(books);
+          }
+          catch (Exception e) {
+       	   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+   	}
      }
     
     //for deleting multiple books
     @DeleteMapping("/delete")
-     public Iterable<Book> deleteBooks(@RequestBody Iterable<Book> book){
-    	Iterable<Book> books= this.senter.deleteBooks(book);
-    	return books;
+     public ResponseEntity<Iterable<Book>> deleteBooks(@RequestBody Iterable<Book> book){
+    	 try {
+    		 Iterable<Book> books= this.senter.deleteBooks(book);
+          	  return ResponseEntity.status(HttpStatus.OK).body(books);
+             }
+             catch (Exception e) {
+          	   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+      	}
     }
     
     //for updating the book
     @PutMapping("/update/{id}")
-     public Book updateBook(@PathVariable int id, @RequestBody Book b) {
-    	 Book boo= this.senter.updateBook(id, b);
-    	 return boo;
+     public ResponseEntity<Book> updateBook(@PathVariable int id, @RequestBody Book b) {
+    	 try {
+    		 Book boo= this.senter.updateBook(id, b);
+          	  return ResponseEntity.status(HttpStatus.OK).body(boo);
+             }
+             catch (Exception e) {
+          	   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+      	}
      }
     
 }
